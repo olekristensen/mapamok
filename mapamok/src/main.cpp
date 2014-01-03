@@ -202,10 +202,6 @@ public:
             }
             updateCalibration(ofGetWindowRect());
         }
-        
-        
-        
-        referencePoints.draw();
     }
     
     void loadModel(string filename) {
