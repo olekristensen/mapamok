@@ -48,7 +48,6 @@
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		C602002DE761F9B52DB4400A /* ObjectFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE75A3FBA2C2D87D14F06FE6 /* ObjectFinder.cpp */; };
 		C6A9EC27E2608C434BCA1DB9 /* guiType2DSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F740139603D171038C4E1057 /* guiType2DSlider.cpp */; };
-		C8A3133118767C5E00FF9DB7 /* ofxProCamToolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C8A3132F18767C5E00FF9DB7 /* ofxProCamToolkit.cpp */; };
 		CBA68AD61765B24C0BFD9886 /* guiBaseObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B7D7ECC5A662345912C93D5 /* guiBaseObject.cpp */; };
 		CBE57D7C657C0B7FD0102864 /* guiTypeMultiToggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF1E9A470F4B02D30B8B1D18 /* guiTypeMultiToggle.cpp */; };
 		D3301F6A0B43BB293ED97C1D /* ofxCvShortImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A4DD23693DFAB8EC05FAA5D /* ofxCvShortImage.cpp */; };
@@ -325,8 +324,6 @@
 		C7B4B8AD9464A693A3683D0F /* ofxUISpacer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxUISpacer.h; path = ../../../addons/ofxUI/src/ofxUISpacer.h; sourceTree = SOURCE_ROOT; };
 		C878437FC072E5D613F2495A /* aiTexture.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = aiTexture.h; path = ../../../addons/ofxAssimpModelLoader/libs/assimp/include/aiTexture.h; sourceTree = SOURCE_ROOT; };
 		C8981066187506F10043096D /* ReferencePoints.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReferencePoints.h; sourceTree = "<group>"; };
-		C8A3132F18767C5E00FF9DB7 /* ofxProCamToolkit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxProCamToolkit.cpp; sourceTree = "<group>"; };
-		C8A3133018767C5E00FF9DB7 /* ofxProCamToolkit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxProCamToolkit.h; sourceTree = "<group>"; };
 		CB6E898FB329C46EC3DEF461 /* aiMatrix4x4.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = aiMatrix4x4.h; path = ../../../addons/ofxAssimpModelLoader/libs/assimp/include/aiMatrix4x4.h; sourceTree = SOURCE_ROOT; };
 		CBD6E9E8B022AB69FE7E454E /* guiTypeVideo.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = guiTypeVideo.h; path = ../../../addons/ofxControlPanel/src/guiTypeVideo.h; sourceTree = SOURCE_ROOT; };
 		CBDE84185E2969BA4AB209FC /* general.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = general.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/general.h; sourceTree = SOURCE_ROOT; };
@@ -560,8 +557,6 @@
 		271086491863A94000509AE4 /* SharedCode */ = {
 			isa = PBXGroup;
 			children = (
-				C8A3132F18767C5E00FF9DB7 /* ofxProCamToolkit.cpp */,
-				C8A3133018767C5E00FF9DB7 /* ofxProCamToolkit.h */,
 				2710864F1863D6C000509AE4 /* MeshUtils.h */,
 				2710864A1863A94000509AE4 /* DraggablePoint.h */,
 				2710864B1863A94000509AE4 /* DraggablePoints.h */,
@@ -1300,7 +1295,6 @@
 				4A71E37D7F36F23AA123EB0B /* guiTypeSlider.cpp in Sources */,
 				9B36FEC1F9A02AF09246572B /* guiTypeText.cpp in Sources */,
 				2B11014060CFA00EA494FBC6 /* guiTypeTextDropDown.cpp in Sources */,
-				C8A3133118767C5E00FF9DB7 /* ofxProCamToolkit.cpp in Sources */,
 				8C3BA55A2996325BB57889A3 /* guiTypeTextInput.cpp in Sources */,
 				849341DBC7A5374C26AC0524 /* guiTypeToggle.cpp in Sources */,
 				871AF250136390C0A8F657DA /* guiTypeVairableLister.cpp in Sources */,

@@ -1,7 +1,6 @@
 #include "ofMain.h"
 #include "ofxAssimpModelLoader.h"
 #include "ofxUI.h"
-#include "ofxProCamToolkit.h"
 #include "DraggablePoints.h"
 #include "MeshUtils.h"
 #include "ofxCv.h"
@@ -27,6 +26,7 @@ public:
 	ofMesh mesh;
 	ofMesh cornerMesh, imageMesh;
     ofMesh refMesh;
+    ofMesh object;
 	ofEasyCam cam;
 	SelectablePoints objectPoints;
 	ReferencePoints referencePoints;
@@ -49,7 +49,6 @@ public:
 		cam.setFarClip(10);
         
         referencePoints.setClickRadius(6);
-        objectPoints.enableControlEvents();
         referencePoints.enableControlEvents();
         referencePoints.enableDrawEvent();
         
@@ -120,10 +119,10 @@ public:
             int renderModeSelection = getSelection(renderMode);
             if(renderModeSelection == RENDER_MODE_FACES) {
                 ofEnableDepthTest();
-                mesh.drawFaces();
+                object.drawFaces();
                 ofDisableDepthTest();
             } else if(renderModeSelection == RENDER_MODE_WIREFRAME_FULL) {
-                mesh.drawWireframe();
+                object.drawWireframe();
             } else if(renderModeSelection == RENDER_MODE_OUTLINE || renderModeSelection == RENDER_MODE_WIREFRAME_OCCLUDED) {
                 prepareRender(true, true, false);
                 glEnable(GL_POLYGON_OFFSET_FILL);
@@ -134,10 +133,10 @@ public:
                     glPolygonOffset(+lineWidth, +lineWidth);
                 }
                 glColorMask(false, false, false, false);
-                mesh.drawFaces();
+                object.drawFaces();
                 glColorMask(true, true, true, true);
                 glDisable(GL_POLYGON_OFFSET_FILL);
-                mesh.drawWireframe();
+                object.drawWireframe();
                 prepareRender(false, false, false);
             }
             glPopMatrix();
@@ -151,8 +150,10 @@ public:
     
     void drawSetup(){
         
-        
-        cam.begin(ofGetWindowRect());
+        //if (firstLoad)
+            //cam.begin(ofGetWindowRect());
+        //else
+            cam.begin(ofRectangle(ofGetWidth()-500, 0, 500, 500));
         ofSetLineWidth(2);
         int renderModeSelection = getSelection(renderMode);
         if(renderModeSelection == RENDER_MODE_FACES) {
@@ -177,26 +178,31 @@ public:
             mesh.drawWireframe();
             prepareRender(false, false, false);
             
-            ofEnableDepthTest();
-            float pointSize = 4;
-            glPointSize(pointSize);
-            ofSetColor(ofColor::magenta);
-            glEnable(GL_POLYGON_OFFSET_POINT);
-            glPolygonOffset(-pointSize, -pointSize);
-            glDisable(GL_POLYGON_OFFSET_POINT);
-            ofDisableDepthTest();
+//            ofEnableDepthTest();
+//            float pointSize = 4;
+//            glPointSize(pointSize);
+//            ofSetColor(ofColor::magenta);
+//            glEnable(GL_POLYGON_OFFSET_POINT);
+//            glPolygonOffset(-pointSize, -pointSize);
+//            glDisable(GL_POLYGON_OFFSET_POINT);
+//            ofDisableDepthTest();
         }
         
         cam.end();
         if(firstLoad){
+            firstLoad = false;
             imageMesh = refMesh;
             project(imageMesh, cam, ofGetWindowRect());
+            object = mesh;
+            project(object, cam, ofGetWindowRect());
+            
             referencePoints.clear();
-            for(int i = 0; i < imageMesh.getVertices().size(); i++){
-                referencePoints.add(imageMesh.getVertices()[i], refMesh.getVertices()[i]);
+            for(int i = 0; i < refMesh.getVertices().size(); i++){
+                referencePoints.add(imageMesh.getVertices()[i], imageMesh.getVertices()[i]);
             }
             updateCalibration(ofGetWindowRect());
         }
+
         
         
         referencePoints.draw();
@@ -215,7 +221,7 @@ public:
         
         vector<ofVec3f> verts = cornerMesh.getVertices();
         int n = verts.size();
-        int skip = n/100;
+        int skip = n/6;
         if(n > 1000)
             for(int i = 0; i < n; i+=skip){
                 refMesh.addVertex(verts[i]);
