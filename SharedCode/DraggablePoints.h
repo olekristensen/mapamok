@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SelectablePoints.h"
+#include "ReferencePoints.h"
 
 class DraggablePoints : public SelectablePoints {
 protected:
@@ -30,11 +31,13 @@ protected:
 	
 public:
 	void mousePressed(ofMouseEventArgs& mouse) {
+        cout<<"mousePressed"<<endl;
 		SelectablePoints::mousePressed(mouse);
 		mouseStart = mouse;
 		cachePositions();
 	}
 	void mouseDragged(ofMouseEventArgs& mouse) {
+        cout<<"mouseDragged"<<endl;
 		ofVec2f offset = mouse - mouseStart;
 		for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
 			points[*itr].position = points[*itr].positionStart + offset;

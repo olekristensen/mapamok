@@ -4,17 +4,17 @@
 
 class WhitePoints : public SelectablePoints {
 public:
-	void draw(ofEventArgs& args) {
+	void draw() {
 		ofSetColor(ofColor::white);
-		SelectablePoints::draw(args);
+		SelectablePoints::draw();
 	}
 };
 
 class GrayPoints : public DraggablePoints {
 public:
-	void draw(ofEventArgs& args) {
+	void draw() {
 		ofSetColor(ofColor::gray);
-		DraggablePoints::draw(args);
+		DraggablePoints::draw();
 	}
 };
 
@@ -29,17 +29,16 @@ public:
 			whitePoints.add(ofVec2f(ofRandomWidth(), ofRandomHeight()));
 		}
 		whitePoints.enableControlEvents();
-		whitePoints.enableDrawEvent();
 		
 		grayPoints.setClickRadius(24);
 		for(int i = 0; i < 12; i++) {
 			grayPoints.add(ofVec2f(ofRandomWidth(), ofRandomHeight()));
 		}
 		grayPoints.enableControlEvents();
-		grayPoints.enableDrawEvent();
 	}
 	void draw() {
 		ofBackground(0);
+        grayPoints.draw();
 	}
 };
 

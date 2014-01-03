@@ -8,7 +8,7 @@ public:
 	virtual void mouseReleased(ofMouseEventArgs& mouse) {}
 	virtual void keyPressed(ofKeyEventArgs& key) {}
 	virtual void keyReleased(ofKeyEventArgs& key) {}
-	virtual void draw(ofEventArgs& args) {}
+    virtual void draw(ofEventArgs& args){}
 	void enableControlEvents() {
 		ofAddListener(ofEvents().keyPressed, this, &EventWatcher::keyPressed);
 		ofAddListener(ofEvents().keyReleased, this, &EventWatcher::keyReleased);
@@ -25,10 +25,10 @@ public:
 		ofRemoveListener(ofEvents().mouseMoved, this, &EventWatcher::mouseMoved);
 		ofRemoveListener(ofEvents().mouseDragged, this, &EventWatcher::mouseDragged);
 	}
-	void enableDrawEvent() {
-		ofAddListener(ofEvents().draw, this, &EventWatcher::draw);
-	}
-	void disableDrawEvent() {
-		ofRemoveListener(ofEvents().draw, this, &EventWatcher::draw);
-	}
+    void enableDrawEvent() {
+        //ofAddListener(ofEvents().draw, this, &EventWatcher::draw);
+    }
+    void disableDrawEvent() {
+        //ofRemoveListener(ofEvents().draw, this, &EventWatcher::draw);
+    }
 };

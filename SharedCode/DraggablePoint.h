@@ -3,6 +3,7 @@
 class DraggablePoint {
 public:
 	ofVec2f position, positionStart;
+    ofVec3f modelPoint;
 	bool selected, dragging;
 	
 	DraggablePoint()
@@ -10,6 +11,7 @@ public:
 	,dragging(false) {
 	}
 	bool isHit(ofVec2f v, float clickRadiusSquared) {
+        cout<<"isHit"<<endl;
 		return position.distanceSquared(v) < clickRadiusSquared;
 	}
 	void draw(float clickRadiusSquared) {
@@ -24,6 +26,7 @@ public:
 		ofPopStyle();
 		ofPushStyle();
 		ofFill();
+        ofSetColor(ofColor::magenta);
 		ofCircle(position, r);
 		ofPopStyle();
 	}

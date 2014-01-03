@@ -7,7 +7,6 @@ class SelectablePoints : public EventWatcher {
 protected:
 	vector<DraggablePoint> points;
 	set<unsigned int> selected;
-	
 	float pointSize, clickRadiusSquared;
 	
 public:
@@ -20,13 +19,18 @@ public:
 	void add(const ofVec2f& v) {
 		points.push_back(DraggablePoint());
 		points.back().position = v;
+        points.back().modelPoint = v;
 	}
+    DraggablePoint get(int i){
+        return points[i];
+    }
+    
 	void setClickRadius(float clickRadius) {
 		this->clickRadiusSquared = clickRadius * clickRadius;
 	}
 	void mousePressed(ofMouseEventArgs& mouse) {
 		bool shift = ofGetKeyPressed(OF_KEY_SHIFT);
-		bool hitAny = false;
+		bool hitAny = true;
 		for(int i = 0; i < size(); i++) {
 			bool hit = points[i].isHit(mouse, clickRadiusSquared);
 			if(hit && !hitAny) {
@@ -41,7 +45,7 @@ public:
 			}
 		}
 	}
-	void draw(ofEventArgs& args) {
+	void draw(){
 		for(int i = 0; i < size(); i++) {
 			points[i].draw(clickRadiusSquared);
 		}
