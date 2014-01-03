@@ -144,16 +144,16 @@ public:
             glPopMatrix();
             glMatrixMode(GL_MODELVIEW);
         }
-
+        
         drawSetup();
     }
     
     void drawSetup(){
         
         //if (firstLoad)
-            //cam.begin(ofGetWindowRect());
+        //cam.begin(ofGetWindowRect());
         //else
-            cam.begin(ofRectangle(ofGetWidth()-500, 0, 500, 500));
+        cam.begin(ofRectangle(ofGetWidth()-500, 0, 500, 500));
         ofSetLineWidth(2);
         int renderModeSelection = getSelection(renderMode);
         if(renderModeSelection == RENDER_MODE_FACES) {
@@ -178,14 +178,14 @@ public:
             mesh.drawWireframe();
             prepareRender(false, false, false);
             
-//            ofEnableDepthTest();
-//            float pointSize = 4;
-//            glPointSize(pointSize);
-//            ofSetColor(ofColor::magenta);
-//            glEnable(GL_POLYGON_OFFSET_POINT);
-//            glPolygonOffset(-pointSize, -pointSize);
-//            glDisable(GL_POLYGON_OFFSET_POINT);
-//            ofDisableDepthTest();
+            //            ofEnableDepthTest();
+            //            float pointSize = 4;
+            //            glPointSize(pointSize);
+            //            ofSetColor(ofColor::magenta);
+            //            glEnable(GL_POLYGON_OFFSET_POINT);
+            //            glPolygonOffset(-pointSize, -pointSize);
+            //            glDisable(GL_POLYGON_OFFSET_POINT);
+            //            ofDisableDepthTest();
         }
         
         cam.end();
@@ -202,7 +202,7 @@ public:
             }
             updateCalibration(ofGetWindowRect());
         }
-
+        
         
         
         referencePoints.draw();
