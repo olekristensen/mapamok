@@ -55,4 +55,27 @@ public:
 			}
 		}
 	}
+    
+    ofVec2f getImagePosition(int i){
+        if(points.size() > i)
+            return points[i].position;
+        else
+            return ofVec2f(0, 0);
+    }
+    
+    ofVec3f getObjectPosition(int i){
+        if(points.size() > i)
+            return points[i].modelPoint;
+        else
+            return ofVec2f(0, 0);
+    }
+    
+    void add(const ofVec2f& img, const ofVec3f& obj) {
+		points.push_back(DraggablePoint());
+		points.back().position = img;
+        points.back().modelPoint = obj;
+	}
+    void add(const DraggablePoint& p){
+        points.push_back(p);
+    }
 };

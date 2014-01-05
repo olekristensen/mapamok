@@ -29,7 +29,7 @@ public:
     ofMesh object;
 	ofEasyCam cam;
 	SelectablePoints objectPoints;
-	ReferencePoints referencePoints;
+	DraggablePoints referencePoints;
 	
 	cv::Mat rvec, tvec;
 	ofMatrix4x4 modelMatrix;
@@ -48,9 +48,8 @@ public:
 		cam.setNearClip(.001);
 		cam.setFarClip(10);
         
-        referencePoints.setClickRadius(6);
-        referencePoints.enableControlEvents();
-        referencePoints.enableDrawEvent();
+
+        //referencePoints.enableDrawEvent();
         
 	}
 	enum {
@@ -196,12 +195,15 @@ public:
             object = mesh;
             project(object, cam, ofGetWindowRect());
             
-            referencePoints.clear();
             for(int i = 0; i < refMesh.getVertices().size(); i++){
                 referencePoints.add(imageMesh.getVertices()[i], imageMesh.getVertices()[i]);
             }
+            referencePoints.setClickRadius(6);
+            referencePoints.enableControlEvents();
             updateCalibration(ofGetWindowRect());
         }
+        
+        referencePoints.draw();
     }
     
     void loadModel(string filename) {
