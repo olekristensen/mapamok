@@ -291,3 +291,41 @@ void prepareRender(bool useDepthTesting, bool useBackFaceCulling, bool useFrontF
 		glDisable(GL_CULL_FACE);
 	}
 }
+
+void saveMatrix(ofMatrix4x4& matrix, string filename){
+    if(ofIsStringInString(filename, ".ply")){
+        ofStringReplace(filename, ".ply", "");
+        
+    }else if(ofIsStringInString(filename, ".dae")){
+        ofStringReplace(filename, ".dae", "");
+    }
+    
+    filename.append("-matrix-calibrated");
+    
+    ofstream fileWrite;
+    fileWrite.open(ofToDataPath(filename).c_str());
+    fileWrite<<matrix;
+    fileWrite.close();
+}
+
+bool loadMatrix(ofMatrix4x4& matrix, string filename){
+    
+    if(ofIsStringInString(filename, ".ply")){
+        ofStringReplace(filename, ".ply", "");
+        
+    }else if(ofIsStringInString(filename, ".dae")){
+        ofStringReplace(filename, ".dae", "");
+    }
+    
+    filename.append("-matrix-calibrated");
+    if(ofFile::doesFileExist(filename)){
+        ifstream fileRead;
+        fileRead.open(ofToDataPath(filename).c_str());
+        fileRead>>matrix;
+        fileRead.close();
+        
+        return true;
+    }else{
+        return false;
+    }
+}

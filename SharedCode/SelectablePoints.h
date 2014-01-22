@@ -21,9 +21,28 @@ public:
 		points.push_back(DraggablePoint());
 		points.back().position = v;
 	}
+    
+    void add(const ofVec2f& img, const ofVec3f& obj) {
+        points.push_back(DraggablePoint());
+        points.back().position = img;
+        points.back().modelPosition = obj;
+    }
 	void setClickRadius(float clickRadius) {
 		this->clickRadiusSquared = clickRadius * clickRadius;
 	}
+    
+    ofVec2f getImagePosition(int i){
+        if(points.size() > i)
+            return points[i].position;
+        else
+            return ofVec2f(0, 0);
+    }
+    ofVec3f getObjectPosition(int i){
+        if(points.size() > i)
+            return points[i].modelPosition;
+        else
+            return ofVec2f(0, 0);
+    }
 	void mousePressed(ofMouseEventArgs& mouse) {
 		bool shift = ofGetKeyPressed(OF_KEY_SHIFT);
 		bool hitAny = false;

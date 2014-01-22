@@ -10,12 +10,13 @@ public:
 	vector<unsigned int> rankedCorners;
 	
 	void setup() {
-//		loadModel("mesh.3ds");
+		loadModel("model.dae");
 	}
 	void loadModel(string filename) {
 		ofxAssimpModelLoader model;
 		model.loadModel(filename);
 		mesh = collapseModel(model);
+        centerAndNormalize(mesh);
 		rankedCorners = getRankedCorners(mesh);
 	}
 	void update() {
@@ -33,10 +34,14 @@ public:
 		cam.begin();
 		ofSetLineWidth(2);
 		ofSetColor(ofColor::red, 16);
+        ofPushMatrix();
+        ofScale(10, 10);
 		mesh.drawWireframe();
+   
 		glPointSize(4);
 		ofSetColor(ofColor::white);
 		controlPoints.draw();
+        ofPopMatrix();
 		cam.end();
 	}
 	void dragEvent(ofDragInfo dragInfo) {

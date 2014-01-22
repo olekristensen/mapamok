@@ -5,50 +5,50 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>AAF0C8A5-6970-406D-B379-4421781630E8</string>
+	<string>48788797-7D5D-4A0C-AF03-678F395BA159</string>
 	<key>IDESourceControlProjectName</key>
 	<string>mapamok</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>251E7897-C8D7-43D7-942C-A55D0752A421</key>
-		<string>ssh://github.com/kylemcdonald/ofxControlPanel.git</string>
-		<key>27BF9310-11F0-49A0-82A1-5792995EC236</key>
-		<string>ssh://github.com/YCAMInterlab/mapamok.git</string>
-		<key>B1E43C6E-2094-4F9D-937D-6F8A12774521</key>
-		<string>ssh://github.com/kylemcdonald/ofxCv.git</string>
-		<key>C5F60473-EC8F-4250-8182-059FDD3C93E2</key>
-		<string>ssh://github.com/kylemcdonald/openFrameworks.git</string>
-		<key>DD8D0B16-DA85-4DF7-9867-5A1F5B4ED4AA</key>
-		<string>ssh://github.com/rezaali/ofxUI.git</string>
+		<key>03356117-2AAE-4722-B82B-F0C2262E1919</key>
+		<string>https://github.com/YCAMInterlab/mapamok.git</string>
+		<key>3AAA1867-0F46-4E99-BF44-5BBBDD9AB038</key>
+		<string>https://github.com/kylemcdonald/ofxControlPanel.git</string>
+		<key>5005E2AC-6078-4AD2-BAC7-649583BD60D9</key>
+		<string>https://github.com/openframeworks/openFrameworks.git</string>
+		<key>88A0492A-3A83-4D5B-8FE0-352A40A7C51C</key>
+		<string>https://github.com/rezaali/ofxUI.git</string>
+		<key>EFB5CBB6-BAEB-46B8-BD2D-DA9C94E1B86F</key>
+		<string>https://github.com/kylemcdonald/ofxCv.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>apps/mapamok/mapamok/mapamok.xcodeproj/project.xcworkspace</string>
+	<string>Bacchus-House/mapamok/mapamok/mapamok.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>251E7897-C8D7-43D7-942C-A55D0752A421</key>
-		<string>../../../../../addons/ofxControlPanel</string>
-		<key>27BF9310-11F0-49A0-82A1-5792995EC236</key>
+		<key>03356117-2AAE-4722-B82B-F0C2262E1919</key>
 		<string>../../..</string>
-		<key>B1E43C6E-2094-4F9D-937D-6F8A12774521</key>
-		<string>../../../../../addons/ofxCv</string>
-		<key>C5F60473-EC8F-4250-8182-059FDD3C93E2</key>
+		<key>3AAA1867-0F46-4E99-BF44-5BBBDD9AB038</key>
+		<string>../../../../../addons/ofxControlPanel</string>
+		<key>5005E2AC-6078-4AD2-BAC7-649583BD60D9</key>
 		<string>../../../../..</string>
-		<key>DD8D0B16-DA85-4DF7-9867-5A1F5B4ED4AA</key>
+		<key>88A0492A-3A83-4D5B-8FE0-352A40A7C51C</key>
 		<string>../../../../../addons/ofxUI</string>
+		<key>EFB5CBB6-BAEB-46B8-BD2D-DA9C94E1B86F</key>
+		<string>../../../../../addons/ofxCv</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/YCAMInterlab/mapamok.git</string>
+	<string>https://github.com/openframeworks/openFrameworks.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>C5F60473-EC8F-4250-8182-059FDD3C93E2</string>
+	<string>5005E2AC-6078-4AD2-BAC7-649583BD60D9</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>27BF9310-11F0-49A0-82A1-5792995EC236</string>
+			<string>03356117-2AAE-4722-B82B-F0C2262E1919</string>
 			<key>IDESourceControlWCCName</key>
 			<string>mapamok</string>
 		</dict>
@@ -56,7 +56,7 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>251E7897-C8D7-43D7-942C-A55D0752A421</string>
+			<string>3AAA1867-0F46-4E99-BF44-5BBBDD9AB038</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ofxControlPanel</string>
 		</dict>
@@ -64,7 +64,7 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>B1E43C6E-2094-4F9D-937D-6F8A12774521</string>
+			<string>EFB5CBB6-BAEB-46B8-BD2D-DA9C94E1B86F</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ofxCv</string>
 		</dict>
@@ -72,7 +72,7 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>DD8D0B16-DA85-4DF7-9867-5A1F5B4ED4AA</string>
+			<string>88A0492A-3A83-4D5B-8FE0-352A40A7C51C</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ofxUI</string>
 		</dict>
@@ -80,7 +80,7 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>C5F60473-EC8F-4250-8182-059FDD3C93E2</string>
+			<string>5005E2AC-6078-4AD2-BAC7-649583BD60D9</string>
 			<key>IDESourceControlWCCName</key>
 			<string>openFrameworks</string>
 		</dict>

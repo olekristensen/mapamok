@@ -3,6 +3,7 @@
 class DraggablePoint {
 public:
 	ofVec2f position, positionStart;
+    ofVec2f modelPosition;
 	bool selected, dragging;
 	
 	DraggablePoint()
