@@ -112,7 +112,7 @@ public:
         }
 	}
     
-
+    
     void drawSetup(ofRectangle foo = ofGetWindowRect()){
         cam.begin(foo);
         ofSetLineWidth(2);
@@ -140,27 +140,27 @@ public:
             prepareRender(false, false, false);
         }
         
-//        ofEnableDepthTest();
-//		float pointSize = 4;
-//		glPointSize(pointSize);
-//		ofSetColor(ofColor::red);
-//		glEnable(GL_POLYGON_OFFSET_POINT);
-//		glPolygonOffset(-pointSize, -pointSize);
-//		cornerMesh.drawVertices();
-//        ofSetColor(ofColor::magenta);
-//        calibrationMesh.drawVertices();
-//		glDisable(GL_POLYGON_OFFSET_POINT);
-//		ofDisableDepthTest();
+        //        ofEnableDepthTest();
+        //		float pointSize = 4;
+        //		glPointSize(pointSize);
+        //		ofSetColor(ofColor::red);
+        //		glEnable(GL_POLYGON_OFFSET_POINT);
+        //		glPolygonOffset(-pointSize, -pointSize);
+        //		cornerMesh.drawVertices();
+        //        ofSetColor(ofColor::magenta);
+        //        calibrationMesh.drawVertices();
+        //		glDisable(GL_POLYGON_OFFSET_POINT);
+        //		ofDisableDepthTest();
         
         cam.end();
         
         
-//        imageMesh = mesh;
-//        project(imageMesh, cam, ofGetWindowRect());
-//        imageMesh.setMode(OF_PRIMITIVE_POINTS);
-//        ofEnableDepthTest();
-//        imageMesh.draw();
-//        ofDisableDepthTest();
+        //        imageMesh = mesh;
+        //        project(imageMesh, cam, ofGetWindowRect());
+        //        imageMesh.setMode(OF_PRIMITIVE_POINTS);
+        //        ofEnableDepthTest();
+        //        imageMesh.draw();
+        //        ofDisableDepthTest();
     }
     
     void drawCalibrated(){
@@ -201,7 +201,7 @@ public:
         }
         
         if(useShader) shader.end();
-                
+        
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
