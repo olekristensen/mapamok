@@ -6,6 +6,7 @@
 class SelectablePoints : public EventWatcher {
 protected:
 	vector<DraggablePoint> points;
+    vector<DraggablePoint> calibrated;
 	set<unsigned int> selected;
 	
 	float pointSize, clickRadiusSquared;
@@ -43,6 +44,23 @@ public:
         else
             return ofVec2f(0, 0);
     }
+    
+    vector<ofVec2f> getSelectedPoints(){
+        vector<ofVec2f> foo;
+        for(vector<DraggablePoint>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
+            foo.push_back((*itr).position);
+        }
+        return foo;
+    }
+    
+    vector<ofVec3f> getModelPoints(){
+        vector<ofVec3f> foo;
+        for(vector<DraggablePoint>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
+            foo.push_back((*itr).modelPosition);
+        }
+        return foo;
+    }
+    
 	void mousePressed(ofMouseEventArgs& mouse) {
 		bool shift = ofGetKeyPressed(OF_KEY_SHIFT);
 		bool hitAny = false;

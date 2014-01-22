@@ -101,41 +101,28 @@ public:
 		return -1;
 	}
     
-    void update(){
-
-        
-    }
-    
 	void draw() {
 		ofBackground(backgroundBrightness);
 		ofSetColor(255);
 		
-        if(calibrationReady)
+        if(calibrationReady){
             drawCalibrated();
-        else if(editToggle && !calibrationReady)
+        }else if(editToggle && !calibrationReady){
             drawSetup();
-        else{
-            imageMesh = mesh;
-            project(imageMesh, cam, ofGetWindowRect());
-            imageMesh.setMode(OF_PRIMITIVE_TRIANGLES);
-            ofEnableDepthTest();
-            imageMesh.draw();
-            ofDisableDepthTest();
         }
 	}
     
-    
-    
+
     void drawSetup(ofRectangle foo = ofGetWindowRect()){
         cam.begin(foo);
         ofSetLineWidth(2);
         int renderModeSelection = getSelection(renderMode);
         if(renderModeSelection == RENDER_MODE_FACES) {
             ofEnableDepthTest();
-            objectVbo.drawFaces();
+            mesh.drawFaces();
             ofDisableDepthTest();
         } else if(renderModeSelection == RENDER_MODE_WIREFRAME_FULL) {
-            objectVbo.drawWireframe();
+            mesh.drawWireframe();
         } else if(renderModeSelection == RENDER_MODE_OUTLINE || renderModeSelection == RENDER_MODE_WIREFRAME_OCCLUDED) {
             prepareRender(true, true, false);
             glEnable(GL_POLYGON_OFFSET_FILL);
@@ -146,26 +133,34 @@ public:
                 glPolygonOffset(+lineWidth, +lineWidth);
             }
             glColorMask(false, false, false, false);
-            objectVbo.drawFaces();
+            mesh.drawFaces();
             glColorMask(true, true, true, true);
             glDisable(GL_POLYGON_OFFSET_FILL);
-            objectVbo.drawWireframe();
+            mesh.drawWireframe();
             prepareRender(false, false, false);
         }
         
-        ofEnableDepthTest();
-		float pointSize = 4;
-		glPointSize(pointSize);
-		ofSetColor(ofColor::red);
-		glEnable(GL_POLYGON_OFFSET_POINT);
-		glPolygonOffset(-pointSize, -pointSize);
-		cornerMesh.drawVertices();
-        ofSetColor(ofColor::magenta);
-        calibrationMesh.drawVertices();
-		glDisable(GL_POLYGON_OFFSET_POINT);
-		ofDisableDepthTest();
+//        ofEnableDepthTest();
+//		float pointSize = 4;
+//		glPointSize(pointSize);
+//		ofSetColor(ofColor::red);
+//		glEnable(GL_POLYGON_OFFSET_POINT);
+//		glPolygonOffset(-pointSize, -pointSize);
+//		cornerMesh.drawVertices();
+//        ofSetColor(ofColor::magenta);
+//        calibrationMesh.drawVertices();
+//		glDisable(GL_POLYGON_OFFSET_POINT);
+//		ofDisableDepthTest();
         
         cam.end();
+        
+        
+//        imageMesh = mesh;
+//        project(imageMesh, cam, ofGetWindowRect());
+//        imageMesh.setMode(OF_PRIMITIVE_POINTS);
+//        ofEnableDepthTest();
+//        imageMesh.draw();
+//        ofDisableDepthTest();
     }
     
     void drawCalibrated(){
@@ -184,10 +179,10 @@ public:
         int renderModeSelection = getSelection(renderMode);
         if(renderModeSelection == RENDER_MODE_FACES) {
             ofEnableDepthTest();
-            objectVbo.drawFaces();
+            object.drawFaces();
             ofDisableDepthTest();
         } else if(renderModeSelection == RENDER_MODE_WIREFRAME_FULL) {
-            objectVbo.drawWireframe();
+            object.drawWireframe();
         } else if(renderModeSelection == RENDER_MODE_OUTLINE || renderModeSelection == RENDER_MODE_WIREFRAME_OCCLUDED) {
             prepareRender(true, true, false);
             glEnable(GL_POLYGON_OFFSET_FILL);
@@ -198,45 +193,25 @@ public:
                 glPolygonOffset(+lineWidth, +lineWidth);
             }
             glColorMask(false, false, false, false);
-            objectVbo.drawFaces();
+            object.drawFaces();
             glColorMask(true, true, true, true);
             glDisable(GL_POLYGON_OFFSET_FILL);
-            objectVbo.drawWireframe();
+            object.drawWireframe();
             prepareRender(false, false, false);
         }
         
         if(useShader) shader.end();
-        
-        if(editToggle){
-            ofEnableDepthTest();
-            float pointSize = 4;
-            glPointSize(pointSize);
-            ofSetColor(ofColor::red);
-            glEnable(GL_POLYGON_OFFSET_POINT);
-            glPolygonOffset(-pointSize, -pointSize);
-            cornerMesh.drawVertices();
-            ofSetColor(ofColor::magenta);
-            calibrationMesh.drawVertices();
-            glDisable(GL_POLYGON_OFFSET_POINT);
-            ofDisableDepthTest();
-        }
-        
+                
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
-        
-        
-        if(editToggle){
-            drawSetup(ofRectangle(ofGetWindowWidth()-500, 0, 500, 500));
-        }
-        
     }
     
     
 	void loadModel(string filename) {
         modelFileName = filename;
-
+        
         
 		model.loadModel(modelFileName);
 		mesh = collapseModel(model);
@@ -248,8 +223,9 @@ public:
 		cornerMesh.addIndices(getRankedCorners(mesh));
         
         
-        objectVbo = object = mesh;
+        object = mesh;
         project(object, cam, ofGetWindowRect());
+        objectVbo = object;
         
         refMesh = cornerMesh;
         project(cornerMesh, cam, ofGetWindowRect());
@@ -257,18 +233,22 @@ public:
         int totalPoints = cornerMesh.getNumVertices();
         int numPoints = totalPoints *0.05;
         for(int i = 0 ; i < totalPoints; i+=totalPoints/numPoints){
-            objectPoints.add(refMesh.getVertices()[i], object.getVertices()[i]);
+            objectPoints.add(object.getVertices()[i], object.getVertices()[i]);
         }
+        
+        objectPoints.setClickRadius(2);
+        objectPoints.enableControlEvents();
+        objectPoints.enableDrawEvent();
         
         if(ofIsStringInString(modelFileName, ".dae"))
             ofStringReplace(modelFileName, ".dae", "");
         if(ofIsStringInString(modelFileName, ".ply"))
             ofStringReplace(modelFileName, ".ply", "");
         
-        loadCalibration(ofGetWindowRect(), modelFileName);
+        loadCalibration(modelFileName);
 	}
     
-    void loadCalibration(ofRectangle viewport, string modelname){
+    void loadCalibration(string modelname, ofRectangle viewport = ofGetWindowRect()){
         Size2i imageSize(viewport.getWidth(), viewport.getHeight());
         float f = imageSize.width * ofDegToRad(aov); // i think this is wrong, but it's optimized out anyway
         Point2f c = Point2f(imageSize) * (1. / 2);
@@ -286,10 +266,15 @@ public:
         } else {
             calibrationReady = false;
         }
-
+        
     }
     
-    void updateCalibration(ofRectangle viewport) {
+    void keyPressed(int key){
+        if(key == ' ')
+            updateCalibration(ofGetWindowRect());
+    }
+    
+    void updateCalibration(ofRectangle viewport = ofGetWindowRect()) {
         
         Size2i imageSize(viewport.getWidth(), viewport.getHeight());
         float f = imageSize.width * ofDegToRad(aov); // i think this is wrong, but it's optimized out anyway
@@ -303,10 +288,13 @@ public:
         Mat distCoeffs;
         vector<vector<Point3f> > referenceObjectPoints(1);
         vector<vector<Point2f> > referenceImagePoints(1);
-        int n = objectPoints.size();
+        vector<ofVec3f> modelPoints = objectPoints.getModelPoints();
+        vector<ofVec2f> selectedPoints = objectPoints.getSelectedPoints();
+        
+        int n = selectedPoints.size();
         for(int i = 0; i < n; i++) {
-            referenceObjectPoints[0].push_back(toCv(objectPoints.getObjectPosition(i)));
-            referenceImagePoints[0].push_back(toCv(objectPoints.getImagePosition(i)));
+            referenceObjectPoints[0].push_back(toCv(modelPoints[i]));
+            referenceImagePoints[0].push_back(toCv(selectedPoints[i]));
         }
         const static int minPoints = 6;
         if(referenceObjectPoints[0].size() >= minPoints) {

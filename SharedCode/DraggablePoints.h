@@ -5,6 +5,7 @@
 class DraggablePoints : public SelectablePoints {
 protected:
 	ofVec2f mouseStart;
+
 	
 	void cachePositions() {
 		for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
@@ -43,6 +44,11 @@ public:
 	void mouseReleased(ofMouseEventArgs& mouse) {
 		cachePositions();
 	}
+    
+    bool isCalibrated(DraggablePoint & pt){
+        return pt.calibrated;
+    }
+    
 	void keyPressed(ofKeyEventArgs& key) {
 		if(isDirectionKey(key.key)) {
 			float multiplier = ofGetKeyPressed(OF_KEY_COMMAND) ? .25 : 1;
@@ -50,6 +56,18 @@ public:
 			for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
 				points[*itr].position += offset;
 			}
-		}
+		}else{
+            if(key.key == OF_KEY_DEL){
+                for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
+                   
+                }
+            }
+            for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
+                points[*itr].calibrated = true;
+                calibrated.push_back(points[*itr]);
+            }
+        }
 	}
+    
+
 };
