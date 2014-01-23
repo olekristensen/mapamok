@@ -9,6 +9,7 @@ public:
 	virtual void keyPressed(ofKeyEventArgs& key) {}
 	virtual void keyReleased(ofKeyEventArgs& key) {}
 	virtual void draw(ofEventArgs& args) {}
+    bool drawEnabled = false;
 	void enableControlEvents() {
 		ofAddListener(ofEvents().keyPressed, this, &EventWatcher::keyPressed);
 		ofAddListener(ofEvents().keyReleased, this, &EventWatcher::keyReleased);
@@ -27,8 +28,17 @@ public:
 	}
 	void enableDrawEvent() {
 		ofAddListener(ofEvents().draw, this, &EventWatcher::draw);
+        drawEnabled = true;
 	}
 	void disableDrawEvent() {
 		ofRemoveListener(ofEvents().draw, this, &EventWatcher::draw);
+        drawEnabled = false;
 	}
+    
+    void toggleDrawEvents(){
+        if(drawEnabled)
+            disableDrawEvent();
+        else
+            enableDrawEvent();
+    }
 };

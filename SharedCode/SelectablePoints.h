@@ -53,6 +53,14 @@ public:
         return foo;
     }
     
+    vector<ofVec3f> getSelectedModelPoints(){
+        vector<ofVec3f> foo;
+        for(vector<DraggablePoint>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
+            foo.push_back((*itr).position);
+        }
+        return foo;
+    }
+    
     vector<ofVec3f> getModelPoints(){
         vector<ofVec3f> foo;
         for(vector<DraggablePoint>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {

@@ -36,6 +36,7 @@ public:
     ofShader shader;
     string modelFileName;
     
+    
     float aov = 0.80;
     
     
@@ -140,17 +141,19 @@ public:
             prepareRender(false, false, false);
         }
         
-        //        ofEnableDepthTest();
-        //		float pointSize = 4;
-        //		glPointSize(pointSize);
-        //		ofSetColor(ofColor::red);
-        //		glEnable(GL_POLYGON_OFFSET_POINT);
-        //		glPolygonOffset(-pointSize, -pointSize);
-        //		cornerMesh.drawVertices();
-        //        ofSetColor(ofColor::magenta);
-        //        calibrationMesh.drawVertices();
-        //		glDisable(GL_POLYGON_OFFSET_POINT);
-        //		ofDisableDepthTest();
+        
+        ofEnableDepthTest();
+        float pointSize = 4;
+        glPointSize(pointSize);
+        ofSetColor(ofColor::green);
+        glEnable(GL_POLYGON_OFFSET_POINT);
+        glPolygonOffset(-pointSize, -pointSize);
+        refMesh.drawVertices();
+        ofSetColor(ofColor::blueSteel);
+        calibrationMesh.drawVertices();
+        glDisable(GL_POLYGON_OFFSET_POINT);
+        ofDisableDepthTest();
+        
         
         cam.end();
         
@@ -173,34 +176,49 @@ public:
         applyMatrix(modelMatrix);
         
         
-        if(useShader)shader.begin();
-        
-        ofSetLineWidth(2);
-        int renderModeSelection = getSelection(renderMode);
-        if(renderModeSelection == RENDER_MODE_FACES) {
-            ofEnableDepthTest();
-            object.drawFaces();
-            ofDisableDepthTest();
-        } else if(renderModeSelection == RENDER_MODE_WIREFRAME_FULL) {
-            object.drawWireframe();
-        } else if(renderModeSelection == RENDER_MODE_OUTLINE || renderModeSelection == RENDER_MODE_WIREFRAME_OCCLUDED) {
-            prepareRender(true, true, false);
-            glEnable(GL_POLYGON_OFFSET_FILL);
-            float lineWidth = ofGetStyle().lineWidth;
-            if(renderModeSelection == RENDER_MODE_OUTLINE) {
-                glPolygonOffset(-lineWidth, -lineWidth);
-            } else if(renderModeSelection == RENDER_MODE_WIREFRAME_OCCLUDED) {
-                glPolygonOffset(+lineWidth, +lineWidth);
+        if(!editToggle){
+            
+            if(useShader)shader.begin();
+            
+            ofSetLineWidth(2);
+            int renderModeSelection = getSelection(renderMode);
+            if(renderModeSelection == RENDER_MODE_FACES) {
+                ofEnableDepthTest();
+                object.drawFaces();
+                ofDisableDepthTest();
+            } else if(renderModeSelection == RENDER_MODE_WIREFRAME_FULL) {
+                object.drawWireframe();
+            } else if(renderModeSelection == RENDER_MODE_OUTLINE || renderModeSelection == RENDER_MODE_WIREFRAME_OCCLUDED) {
+                prepareRender(true, true, false);
+                glEnable(GL_POLYGON_OFFSET_FILL);
+                float lineWidth = ofGetStyle().lineWidth;
+                if(renderModeSelection == RENDER_MODE_OUTLINE) {
+                    glPolygonOffset(-lineWidth, -lineWidth);
+                } else if(renderModeSelection == RENDER_MODE_WIREFRAME_OCCLUDED) {
+                    glPolygonOffset(+lineWidth, +lineWidth);
+                }
+                glColorMask(false, false, false, false);
+                object.drawFaces();
+                glColorMask(true, true, true, true);
+                glDisable(GL_POLYGON_OFFSET_FILL);
+                object.drawWireframe();
+                prepareRender(false, false, false);
             }
-            glColorMask(false, false, false, false);
-            object.drawFaces();
-            glColorMask(true, true, true, true);
-            glDisable(GL_POLYGON_OFFSET_FILL);
-            object.drawWireframe();
-            prepareRender(false, false, false);
+            
+            if(useShader) shader.end();
+        }else{
+            ofEnableDepthTest();
+            float pointSize = 4;
+            glPointSize(pointSize);
+            ofSetColor(ofColor::green);
+            glEnable(GL_POLYGON_OFFSET_POINT);
+            glPolygonOffset(-pointSize, -pointSize);
+            refMesh.drawVertices();
+            ofSetColor(ofColor::blueSteel);
+            calibrationMesh.drawVertices();
+            glDisable(GL_POLYGON_OFFSET_POINT);
+            ofDisableDepthTest();
         }
-        
-        if(useShader) shader.end();
         
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
@@ -231,9 +249,10 @@ public:
         project(cornerMesh, cam, ofGetWindowRect());
         
         int totalPoints = cornerMesh.getNumVertices();
-        int numPoints = totalPoints *0.05;
+        int numPoints = totalPoints;
         for(int i = 0 ; i < totalPoints; i+=totalPoints/numPoints){
-            objectPoints.add(object.getVertices()[i], object.getVertices()[i]);
+            objectPoints.add(cornerMesh.getVertices()[i], object.getVertices()[i]);
+            calibrationMesh.addVertex(cornerMesh.getVertices()[i]);
         }
         
         objectPoints.setClickRadius(2);
@@ -245,7 +264,7 @@ public:
         if(ofIsStringInString(modelFileName, ".ply"))
             ofStringReplace(modelFileName, ".ply", "");
         
-        loadCalibration(modelFileName);
+        //loadCalibration(modelFileName);
 	}
     
     void loadCalibration(string modelname, ofRectangle viewport = ofGetWindowRect()){
@@ -272,6 +291,8 @@ public:
     void keyPressed(int key){
         if(key == ' ')
             updateCalibration(ofGetWindowRect());
+        if(key == OF_KEY_CONTROL)
+            objectPoints.toggleDrawEvents();
     }
     
     void updateCalibration(ofRectangle viewport = ofGetWindowRect()) {
@@ -291,6 +312,8 @@ public:
         vector<ofVec3f> modelPoints = objectPoints.getModelPoints();
         vector<ofVec2f> selectedPoints = objectPoints.getSelectedPoints();
         
+
+        
         int n = selectedPoints.size();
         for(int i = 0; i < n; i++) {
             referenceObjectPoints[0].push_back(toCv(modelPoints[i]));
@@ -298,6 +321,12 @@ public:
         }
         const static int minPoints = 6;
         if(referenceObjectPoints[0].size() >= minPoints) {
+            refMesh.clear();
+            refMesh.addVertices(modelPoints);
+            
+            calibrationMesh.clear();
+            calibrationMesh.addVertices(objectPoints.getSelectedModelPoints());
+            
             calibrateCamera(referenceObjectPoints, referenceImagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, CV_CALIB_USE_INTRINSIC_GUESS);
             rvec = rvecs[0];
             tvec = tvecs[0];
@@ -320,7 +349,9 @@ public:
 	}
     
     void exit(){
-        saveMatrix(modelMatrix, modelFileName);
+      //  saveMatrix(modelMatrix, modelFileName);
+        saveMat(rvec, modelFileName+"-rotation-calibration");
+        saveMat(tvec, modelFileName+"-translation-calibration");
     }
 };
 

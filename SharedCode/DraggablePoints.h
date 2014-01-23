@@ -5,7 +5,7 @@
 class DraggablePoints : public SelectablePoints {
 protected:
 	ofVec2f mouseStart;
-
+    
 	
 	void cachePositions() {
 		for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
@@ -59,7 +59,7 @@ public:
 		}else{
             if(key.key == OF_KEY_DEL){
                 for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
-                   
+                    
                 }
             }
             for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
@@ -69,5 +69,5 @@ public:
         }
 	}
     
-
+    
 };
