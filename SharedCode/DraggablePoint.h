@@ -8,7 +8,8 @@ public:
 	
 	DraggablePoint()
 	:selected(false)
-	,dragging(false) {
+	,dragging(false)
+    ,calibrated(false){
 	}
 	bool isHit(ofVec2f v, float clickRadiusSquared) {
 		return position.distanceSquared(v) < clickRadiusSquared*10;
@@ -25,7 +26,15 @@ public:
 		ofPopStyle();
 		ofPushStyle();
 		ofFill();
-		ofCircle(position, r);
+        if(!calibrated)
+            ofCircle(position, r);
+        else{
+            ofPushStyle();
+            ofSetColor(ofColor::green);
+            ofCircle(position, r);
+            ofPopStyle();
+        }
+            
 		ofPopStyle();
 	}
 };

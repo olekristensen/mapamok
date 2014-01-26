@@ -45,10 +45,6 @@ public:
 		cachePositions();
 	}
     
-    bool isCalibrated(DraggablePoint & pt){
-        return pt.calibrated;
-    }
-    
 	void keyPressed(ofKeyEventArgs& key) {
 		if(isDirectionKey(key.key)) {
 			float multiplier = ofGetKeyPressed(OF_KEY_COMMAND) ? .25 : 1;
@@ -59,12 +55,18 @@ public:
 		}else{
             if(key.key == OF_KEY_DEL){
                 for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
-                    
+                    if(points[*itr].calibrated == true){
+                        points[*itr].calibrated = false;
+                        calibrated.erase(*itr);
+                    }
                 }
-            }
-            for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
-                points[*itr].calibrated = true;
-                calibrated.push_back(points[*itr]);
+            }else if(!bCalibrated){
+                for(set<unsigned int>::iterator itr = selected.begin(); itr != selected.end(); itr++) {
+                    if(points[*itr].calibrated != true){
+                        points[*itr].calibrated = true;
+                        calibrated.insert(*itr);
+                    }
+                }
             }
         }
 	}

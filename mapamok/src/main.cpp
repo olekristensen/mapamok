@@ -4,45 +4,71 @@
 #include "DraggablePoints.h"
 #include "MeshUtils.h"
 #include "ofxCv.h"
+#include "ofAutoShader.h"
 using namespace ofxCv;
 using namespace cv;
 
 class ofApp : public ofBaseApp {
 public:
+    
+    enum {
+		RENDER_MODE_WIREFRAME_OCCLUDED = 0,
+		RENDER_MODE_WIREFRAME_FULL,
+		RENDER_MODE_OUTLINE,
+		RENDER_MODE_FACES,
+	};
+    
+    
 	ofxUICanvas* gui;
 	ofxUIRadio* renderMode;
 	
-	bool editToggle = true;
+	bool editToggle = false;
+    bool moveModel = false;
+    bool clear = false;
 	bool loadButton = false;
 	bool saveButton = false;
-	float backgroundBrightness = 0;
 	bool useShader = false;
+    bool useSphereLights = false;
+    bool useLightShader = false;
     bool calibrationReady = false;
-	
+    bool objectLoaded = false;
+    bool cullBack = false;
+    bool validShader = false;
+    bool fullScreen = false;
+    float backgroundBrightness = 0;
+    float aov = 0.80;
+    
     ofxAssimpModelLoader model;
 	ofMesh mesh;
 	ofMesh cornerMesh, imageMesh;
     ofMesh calibrationMesh;
     ofMesh refMesh;
     ofMesh object;
-    
     ofVboMesh objectVbo;
+    ofLight light;
     
 	ofEasyCam cam;
 	DraggablePoints objectPoints;
     cv::Mat rvec, tvec;
     ofMatrix4x4 modelMatrix;
     ofxCv::Intrinsics intrinsics;
-    ofShader shader;
+    
+    ofAutoShader shader;
+    ofAutoShader sphereShader;
+    
     string modelFileName;
+    ofVec2f mousePoint;
+    ofRectangle fooRect;
     
-    
-    float aov = 0.80;
-    
-    
+    //Sphere Lights
+    vector<float> lightRadii;
+	vector<ofVec3f> lightPositions;
+    ofIcoSpherePrimitive sphere;
     
 	void setup() {
 		ofSetWindowTitle("mapamok");
+        ofSetVerticalSync(true);
+        
 		setupGui();
 		if(ofFile::doesFileExist("model.dae")) {
 			loadModel("model.dae");
@@ -50,13 +76,31 @@ public:
 		cam.setDistance(1);
 		cam.setNearClip(.1);
 		cam.setFarClip(10);
+        
+        fooRect = ofRectangle(ofGetWidth()-100, ofGetHeight()-100, 100, 100);
+        
+        light.setPosition(0, 0, 0);
+        
+        shader.setup("shaders/shader");
+        sphereShader.setup("shaders/sphere");
+        
+        
+        int n = 12;
+		lightPositions.resize(n);
+		for(int i = 0; i < n; i++) {
+			lightRadii.push_back(ofRandom(1, 30));
+		}
+        
+        sphere.setMode(OF_PRIMITIVE_POINTS);
+		sphere.set(1, 3);
 	}
-	enum {
-		RENDER_MODE_WIREFRAME_OCCLUDED = 0,
-		RENDER_MODE_WIREFRAME_FULL,
-		RENDER_MODE_OUTLINE,
-		RENDER_MODE_FACES,
-	};
+    
+    
+    ofVec3f noise3d(float x, float y) {
+        return ofVec3f(ofGetWidth()/2+sin(x),
+                       ofGetHeight()/2+cos(y),
+                       sin(x*y));
+    }
 	void setupGui() {
 		gui = new ofxUICanvas();
 		
@@ -72,9 +116,12 @@ public:
         
 		gui->addSpacer();
 		gui->addLabel("Calibration");
+        gui->addToggle("Move Model", &moveModel);
 		gui->addToggle("Edit", &editToggle);
 		gui->addButton("Load", &loadButton);
-		gui->addButton("Save", &saveButton);
+		gui->addToggle("Save", &saveButton);
+        gui->addButton("Clear Calibration", &clear);
+        
 		
 		gui->addSpacer();
 		gui->addLabel("Render");
@@ -85,10 +132,13 @@ public:
 		renderModes.push_back("Faces");
 		renderMode = gui->addRadio("Render", renderModes, OFX_UI_ORIENTATION_VERTICAL, OFX_UI_FONT_MEDIUM);
 		renderMode->activateToggle(renderModes[0]);
+        gui->addToggle("Cull Back", &cullBack);
 		
 		gui->addSpacer();
 		gui->addMinimalSlider("Background", 0, 255, &backgroundBrightness);
-		gui->addToggle("Use shader", &useShader);
+		gui->addToggle("Shader", &useShader);
+        gui->addToggle("Sphere Lights", &useSphereLights);
+        gui->addToggle("Light Shader", &useLightShader);
 		
 		gui->autoSizeToFitWidgets();
 	}
@@ -108,15 +158,76 @@ public:
 		
         if(calibrationReady){
             drawCalibrated();
-        }else if(editToggle && !calibrationReady){
+        }else if(editToggle){
             drawSetup();
         }
+        if(!calibrationReady || clear){
+            drawCalibrate();
+            drawMouse();
+        }
+        
+        
+        int n = lightPositions.size();
+        for(int i = 0; i < n; i++) {
+			ofPushMatrix();
+			ofTranslate(lightPositions[i]);
+			ofScale(lightRadii[i], lightRadii[i], lightRadii[i]);
+			sphere.draw();
+			ofPopMatrix();
+		}
 	}
     
+    void drawCalibrate(ofRectangle foo = ofGetWindowRect()){
+        ofPushStyle();
+        {
+            ofEnableAlphaBlending();
+            ofSetColor(ofColor::magenta, 100);
+            if(moveModel){
+                objectPoints.clear();
+                calibrationMesh.clear();
+                
+                object = mesh;
+                project(object, cam, ofGetWindowRect());
+                objectVbo = object;
+                
+                cornerMesh = refMesh;
+                project(cornerMesh, cam, ofGetWindowRect());
+                
+                float totalPoints = cornerMesh.getNumVertices();
+                float numPoints = totalPoints;
+                float cutOff = 1.0;
+                while(numPoints > 200 && cutOff > 0){
+                    numPoints = totalPoints*cutOff;
+                    cutOff -= 0.1;
+                }
+                for(int i = 0 ; i < totalPoints; i+=totalPoints/numPoints){
+                    objectPoints.add(cornerMesh.getVertices()[i], object.getVertices()[i]);
+                }
+            }
+            ofEnableDepthTest();
+            imageMesh.draw();
+            ofDisableDepthTest();
+            ofDisableAlphaBlending();
+        }
+        ofPopStyle();
+    }
+    void drawMouse(){
+        ofEnableAlphaBlending();
+        ofPushStyle();
+        {
+            ofSetLineWidth(1);
+            ofSetColor(255, 0, 255, 100);
+            ofLine(ofGetMouseX(), 0, ofGetMouseX(), ofGetWindowHeight());
+            ofSetColor(255,255, 0, 100);
+            ofLine(0, ofGetMouseY(), ofGetWindowWidth(), ofGetMouseY());
+        }
+        ofPopStyle();
+    }
     
     void drawSetup(ofRectangle foo = ofGetWindowRect()){
         cam.begin(foo);
         ofSetLineWidth(2);
+        ofSetColor(ofColor::blueViolet);
         int renderModeSelection = getSelection(renderMode);
         if(renderModeSelection == RENDER_MODE_FACES) {
             ofEnableDepthTest();
@@ -142,31 +253,82 @@ public:
         }
         
         
+        
         ofEnableDepthTest();
-        float pointSize = 4;
+        float pointSize = 2;
         glPointSize(pointSize);
-        ofSetColor(ofColor::green);
         glEnable(GL_POLYGON_OFFSET_POINT);
         glPolygonOffset(-pointSize, -pointSize);
-        refMesh.drawVertices();
-        ofSetColor(ofColor::blueSteel);
+        ofSetColor(ofColor::white);
         calibrationMesh.drawVertices();
         glDisable(GL_POLYGON_OFFSET_POINT);
         ofDisableDepthTest();
         
-        
         cam.end();
         
         
-        //        imageMesh = mesh;
-        //        project(imageMesh, cam, ofGetWindowRect());
-        //        imageMesh.setMode(OF_PRIMITIVE_POINTS);
-        //        ofEnableDepthTest();
-        //        imageMesh.draw();
-        //        ofDisableDepthTest();
     }
     
+    void update(){
+        int n = lightPositions.size();
+		float t = ofGetElapsedTimef() * .05;
+		for(int i = 0; i < n; i++) {
+			lightPositions[i] = noise3d(i, t);
+			lightPositions[i] *= 256;
+		}
+        if(clear){
+            cornerMesh = mesh;
+            cornerMesh.clearIndices();
+            cornerMesh.setMode(OF_PRIMITIVE_POINTS);
+            cornerMesh.addIndices(getRankedCorners(mesh));
+            
+            object = mesh;
+            project(object, cam, ofGetWindowRect());
+            objectVbo = object;
+            refMesh = cornerMesh;
+            project(cornerMesh, cam, ofGetWindowRect());
+            
+            
+            float totalPoints = cornerMesh.getNumVertices();
+            float numPoints = totalPoints;
+            float cutOff = 1.0;
+            while(numPoints > 200 && cutOff > 0){
+                numPoints = totalPoints*cutOff;
+                cutOff -= 0.001;
+            }
+            for(int i = 0 ; i < totalPoints; i+=numPoints){
+                objectPoints.add(cornerMesh.getVertices()[i], object.getVertices()[i]);
+                calibrationMesh.addVertex(cornerMesh.getVertices()[i]);
+            }
+            objectPoints.isCalibrated(calibrationReady);
+            calibrationReady = false;
+            clear = false;
+        }
+        if(calibrationReady && saveButton){
+            save();
+            saveButton = false;
+        }
+    }
+    
+    void drawShaderDebug(){
+        ofPushStyle();
+		ofSetColor(ofColor::magenta);
+		ofSetLineWidth(8);
+		ofLine(0, 0, ofGetWidth(), ofGetHeight());
+		ofLine(ofGetWidth(), 0, 0, ofGetHeight());
+		string message = "Shader failed to compile.";
+		ofVec2f center(ofGetWidth(), ofGetHeight());
+		center /= 2;
+		center.x -= message.size() * 8 / 2;
+		center.y -= 8;
+		drawHighlightString(message, center);
+		ofPopStyle();
+    }
+    
+    
     void drawCalibrated(){
+        ofPushStyle();
+        ofPushMatrix();
         glPushMatrix();
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -178,16 +340,51 @@ public:
         
         if(!editToggle){
             
-            if(useShader)shader.begin();
+            
+            if(useShader) {
+                glPushAttrib(GL_ALL_ATTRIB_BITS);
+                glEnable(GL_DEPTH_TEST);
+                if(useShader) {
+                    shader.begin();
+                    shader.setUniform1f("elapsedTime", ofGetElapsedTimef());
+                    shader.end();
+                }
+                if(useLightShader){
+                    
+                }
+                if(useSphereLights){
+                    sphereShader.begin();
+                    sphereShader.setUniform1f("diffuseLight", ofMap(sin(ofGetElapsedTimef()/60), -1, 1, 0, 1));
+                    sphereShader.setUniform1i("numLights", lightPositions.size());
+                    sphereShader.setUniform3fv("lightPositions", (float*) &(lightPositions[0]), lightPositions.size());
+                    sphereShader.setUniform1fv("lightRadii", (float*) &(lightRadii[0]), lightRadii.size());
+                    sphereShader.end();
+                }
+            }
             
             ofSetLineWidth(2);
             int renderModeSelection = getSelection(renderMode);
             if(renderModeSelection == RENDER_MODE_FACES) {
+                if(useShader) shader.begin();
+                if(useSphereLights)sphereShader.begin();
+                if(cullBack){
+                    glEnable(GL_CULL_FACE);
+                    glCullFace(GL_BACK);
+                }
                 ofEnableDepthTest();
                 object.drawFaces();
                 ofDisableDepthTest();
+                if(useSphereLights)sphereShader.end();
+                if(useShader) shader.end();
+                if(cullBack){
+                    glDisable(GL_CULL_FACE);
+                }
             } else if(renderModeSelection == RENDER_MODE_WIREFRAME_FULL) {
+                if(useShader) shader.begin();
+                if(useSphereLights)sphereShader.begin();
                 object.drawWireframe();
+                if(useSphereLights)sphereShader.end();
+                if(useShader) shader.end();
             } else if(renderModeSelection == RENDER_MODE_OUTLINE || renderModeSelection == RENDER_MODE_WIREFRAME_OCCLUDED) {
                 prepareRender(true, true, false);
                 glEnable(GL_POLYGON_OFFSET_FILL);
@@ -198,14 +395,17 @@ public:
                     glPolygonOffset(+lineWidth, +lineWidth);
                 }
                 glColorMask(false, false, false, false);
+                if(useShader) shader.begin();
+                if(useSphereLights)sphereShader.begin();
                 object.drawFaces();
                 glColorMask(true, true, true, true);
                 glDisable(GL_POLYGON_OFFSET_FILL);
                 object.drawWireframe();
+                if(useSphereLights)sphereShader.end();
+                if(useShader) shader.end();
                 prepareRender(false, false, false);
             }
             
-            if(useShader) shader.end();
         }else{
             ofEnableDepthTest();
             float pointSize = 4;
@@ -214,7 +414,7 @@ public:
             glEnable(GL_POLYGON_OFFSET_POINT);
             glPolygonOffset(-pointSize, -pointSize);
             refMesh.drawVertices();
-            ofSetColor(ofColor::blueSteel);
+            ofSetColor(ofColor::yellow);
             calibrationMesh.drawVertices();
             glDisable(GL_POLYGON_OFFSET_POINT);
             ofDisableDepthTest();
@@ -224,33 +424,54 @@ public:
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
+        ofPopMatrix();
+        ofPopStyle();
     }
     
     
 	void loadModel(string filename) {
         modelFileName = filename;
         
-        
 		model.loadModel(modelFileName);
 		mesh = collapseModel(model);
 		centerAndNormalize(mesh);
 		
-		cornerMesh = mesh;
-		cornerMesh.clearIndices();
-		cornerMesh.setMode(OF_PRIMITIVE_POINTS);
-		cornerMesh.addIndices(getRankedCorners(mesh));
+        if(ofIsStringInString(modelFileName, ".dae"))
+            ofStringReplace(modelFileName, ".dae", "");
+        if(ofIsStringInString(modelFileName, ".ply"))
+            ofStringReplace(modelFileName, ".ply", "");
+        
+        if(loadCalibration(modelFileName)){
+            object.load(modelFileName+"-mesh");
+            cornerMesh.load(modelFileName+"-corner");
+            
+            
+            refMesh = mesh;
+            refMesh.clearIndices();
+            refMesh.setMode(OF_PRIMITIVE_POINTS);
+            refMesh.addIndices(getRankedCorners(mesh));
+        }else{
+            cornerMesh = mesh;
+            cornerMesh.clearIndices();
+            cornerMesh.setMode(OF_PRIMITIVE_POINTS);
+            cornerMesh.addIndices(getRankedCorners(mesh));
+            
+            object = mesh;
+            project(object, cam, ofGetWindowRect());
+            objectVbo = object;
+            refMesh = cornerMesh;
+            project(cornerMesh, cam, ofGetWindowRect());
+        }
         
         
-        object = mesh;
-        project(object, cam, ofGetWindowRect());
-        objectVbo = object;
-        
-        refMesh = cornerMesh;
-        project(cornerMesh, cam, ofGetWindowRect());
-        
-        int totalPoints = cornerMesh.getNumVertices();
-        int numPoints = totalPoints;
-        for(int i = 0 ; i < totalPoints; i+=totalPoints/numPoints){
+        float totalPoints = cornerMesh.getNumVertices();
+        float numPoints = totalPoints;
+        float cutOff = 1.0;
+        while(numPoints > 200 && cutOff > 0.01){
+            numPoints = totalPoints*cutOff;
+            cutOff -= 0.001;
+        }
+        for(int i = 0 ; i < totalPoints; i++){
             objectPoints.add(cornerMesh.getVertices()[i], object.getVertices()[i]);
             calibrationMesh.addVertex(cornerMesh.getVertices()[i]);
         }
@@ -259,15 +480,10 @@ public:
         objectPoints.enableControlEvents();
         objectPoints.enableDrawEvent();
         
-        if(ofIsStringInString(modelFileName, ".dae"))
-            ofStringReplace(modelFileName, ".dae", "");
-        if(ofIsStringInString(modelFileName, ".ply"))
-            ofStringReplace(modelFileName, ".ply", "");
-        
-        //loadCalibration(modelFileName);
+        objectLoaded = true;
 	}
     
-    void loadCalibration(string modelname, ofRectangle viewport = ofGetWindowRect()){
+    bool loadCalibration(string modelname, ofRectangle viewport = ofGetWindowRect()){
         Size2i imageSize(viewport.getWidth(), viewport.getHeight());
         float f = imageSize.width * ofDegToRad(aov); // i think this is wrong, but it's optimized out anyway
         Point2f c = Point2f(imageSize) * (1. / 2);
@@ -286,6 +502,7 @@ public:
             calibrationReady = false;
         }
         
+        return calibrationReady;
     }
     
     void keyPressed(int key){
@@ -312,7 +529,7 @@ public:
         vector<ofVec3f> modelPoints = objectPoints.getModelPoints();
         vector<ofVec2f> selectedPoints = objectPoints.getSelectedPoints();
         
-
+        
         
         int n = selectedPoints.size();
         for(int i = 0; i < n; i++) {
@@ -325,33 +542,44 @@ public:
             refMesh.addVertices(modelPoints);
             
             calibrationMesh.clear();
-            calibrationMesh.addVertices(objectPoints.getSelectedModelPoints());
+            calibrationMesh.addVertices(modelPoints);
             
             calibrateCamera(referenceObjectPoints, referenceImagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, CV_CALIB_USE_INTRINSIC_GUESS);
             rvec = rvecs[0];
             tvec = tvecs[0];
             intrinsics.setup(cameraMatrix, imageSize);
-            saveMat(rvec, modelFileName+"-rotation-calibration");
-            saveMat(tvec, modelFileName+"-translation-calibration");
             modelMatrix = makeMatrix(rvec, tvec);
             calibrationReady = true;
         } else {
             calibrationReady = false;
         }
+        
+        objectPoints.isCalibrated(calibrationReady);
     }
     
+    void mouseMoved(int x, int y){
+        mousePoint.set(x, y);
+    }
     
 	void dragEvent(ofDragInfo dragInfo) {
 		if(dragInfo.files.size() == 1) {
 			string filename = dragInfo.files[0];
-			loadModel(filename);
+            loadModel(filename);
 		}
 	}
     
     void exit(){
-      //  saveMatrix(modelMatrix, modelFileName);
-        saveMat(rvec, modelFileName+"-rotation-calibration");
-        saveMat(tvec, modelFileName+"-translation-calibration");
+        if(calibrationReady)
+            save();
+    }
+    
+    void save(){
+        if(objectLoaded){
+            saveMat(rvec, modelFileName+"-rotation-calibration");
+            saveMat(tvec, modelFileName+"-translation-calibration");
+            object.save(modelFileName+"-mesh");
+            cornerMesh.save(modelFileName+"-corner");
+        }
     }
 };
 

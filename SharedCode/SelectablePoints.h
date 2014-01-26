@@ -6,8 +6,9 @@
 class SelectablePoints : public EventWatcher {
 protected:
 	vector<DraggablePoint> points;
-    vector<DraggablePoint> calibrated;
+    set<unsigned int> calibrated;
 	set<unsigned int> selected;
+    bool bCalibrated;
 	
 	float pointSize, clickRadiusSquared;
 	
@@ -22,7 +23,7 @@ public:
 		points.push_back(DraggablePoint());
 		points.back().position = v;
 	}
-    
+
     void add(const ofVec2f& img, const ofVec3f& obj) {
         points.push_back(DraggablePoint());
         points.back().position = img;
@@ -47,26 +48,30 @@ public:
     
     vector<ofVec2f> getSelectedPoints(){
         vector<ofVec2f> foo;
-        for(vector<DraggablePoint>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
-            foo.push_back((*itr).position);
+        for(set<unsigned int>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
+            foo.push_back(points[*itr].position);
         }
         return foo;
     }
     
     vector<ofVec3f> getSelectedModelPoints(){
         vector<ofVec3f> foo;
-        for(vector<DraggablePoint>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
-            foo.push_back((*itr).position);
+        for(set<unsigned int>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
+            foo.push_back(points[*itr].position);
         }
         return foo;
     }
     
     vector<ofVec3f> getModelPoints(){
         vector<ofVec3f> foo;
-        for(vector<DraggablePoint>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
-            foo.push_back((*itr).modelPosition);
+        for(set<unsigned int>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
+            foo.push_back(points[*itr].modelPosition);
         }
         return foo;
+    }
+    
+    void isCalibrated(bool foo){
+        bCalibrated = foo;
     }
     
 	void mousePressed(ofMouseEventArgs& mouse) {
@@ -87,8 +92,20 @@ public:
 		}
 	}
 	void draw(ofEventArgs& args) {
-		for(int i = 0; i < size(); i++) {
-			points[i].draw(clickRadiusSquared);
-		}
+        if(!bCalibrated){
+            for(int i = 0; i < size(); i++) {
+                points[i].draw(clickRadiusSquared);
+            }
+        }else{
+            for(set<unsigned int>::iterator itr = calibrated.begin(); itr != calibrated.end(); ++itr) {
+                points[*itr].draw(clickRadiusSquared);
+            }
+        }
 	}
+    
+    void clear(){
+        points.clear();
+        calibrated.clear();
+        selected.clear();
+    }
 };
