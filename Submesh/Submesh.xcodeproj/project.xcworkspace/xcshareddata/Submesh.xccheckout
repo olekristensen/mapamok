@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>36AB201B-0510-4730-87CE-D7ADD0C5E031</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Submesh</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>3D7BC557-5994-4637-AE75-C2714F5F2AEF</key>
+		<string>https://github.com/YCAMInterlab/mapamok.git</string>
+		<key>AEF602A4-A70E-4E66-822C-2B46CEB794E2</key>
+		<string>https://github.com/openframeworks/openFrameworks.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Bacchus-House/mapamok/Submesh/Submesh.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>3D7BC557-5994-4637-AE75-C2714F5F2AEF</key>
+		<string>../../..</string>
+		<key>AEF602A4-A70E-4E66-822C-2B46CEB794E2</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/YCAMInterlab/mapamok.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>AEF602A4-A70E-4E66-822C-2B46CEB794E2</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>3D7BC557-5994-4637-AE75-C2714F5F2AEF</string>
+			<key>IDESourceControlWCCName</key>
+			<string>mapamok</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>AEF602A4-A70E-4E66-822C-2B46CEB794E2</string>
+			<key>IDESourceControlWCCName</key>
+			<string>openFrameworks</string>
+		</dict>
+	</array>
+</dict>
+</plist>

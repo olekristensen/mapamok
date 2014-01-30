@@ -245,6 +245,37 @@ void centerAndNormalize(ofMesh& mesh) {
 	}
 }
 
+void centerAndNormalizeShape(vector<ofMesh>& mesh) {
+	ofVec3f cornerMin, cornerMax;
+    ofMesh tempMesh;
+    for(int i = 0; i < mesh.size(); i++){
+        tempMesh.append(mesh[i]);
+    }
+	getBoundingBox(tempMesh, cornerMin, cornerMax);
+	ofVec3f translate = -(cornerMax + cornerMin) / 2;
+	ofVec3f range = (cornerMax - cornerMin);
+	float maxRange = 0;
+	maxRange = MAX(maxRange, range.x);
+	maxRange = MAX(maxRange, range.y);
+	maxRange = MAX(maxRange, range.z);
+	float scale = 1 / maxRange;
+    for(int i = 0; i < mesh.size(); i++){
+        vector<ofVec3f>& vertices = mesh[i].getVertices();
+        for(int j = 0; j < vertices.size(); j++) {
+            vertices[j] += translate;
+            vertices[j] *= scale;
+        }
+    }
+}
+
+void placeMesh(ofMesh& mesh, ofxAssimpModelLoader& model){
+    ofMatrix4x4 matrix = model.getModelMatrix();
+    for(int i = 0; i < mesh.getNumVertices(); i++){
+        ofVec3f& cur = mesh.getVerticesPointer()[i];
+        cur = cur * matrix;
+    }
+}
+
 void project(ofMesh& mesh, const ofCamera& camera, ofRectangle viewport) {
 	ofMatrix4x4 modelViewProjectionMatrix = camera.getModelViewProjectionMatrix(viewport);
 	viewport.width /= 2;
@@ -267,13 +298,26 @@ void drawNormals(const ofMesh& mesh, float normalLength) {
 	}
 }
 
-ofMesh collapseModel(ofxAssimpModelLoader model) {
+ofMesh collapseModel(ofxAssimpModelLoader& model) {
 	ofMesh mesh;
 	for(int i = 0; i < model.getNumMeshes(); i++) {
 		ofMesh curMesh = model.getMesh(i);
 		mesh.append(curMesh);
 	}
 	return mesh;
+}
+
+vector<ofMesh> expandModel(ofxAssimpModelLoader& model){
+    vector<ofMesh> mesh;
+    ofMesh master;
+    for(int i = 0; i < model.getNumMeshes(); i++){
+        ofMesh curMesh = model.getMesh(i);
+        placeMesh(curMesh, model);
+        mesh.push_back(curMesh);
+    }
+    centerAndNormalizeShape(mesh);
+
+    return mesh;
 }
 
 void prepareRender(bool useDepthTesting, bool useBackFaceCulling, bool useFrontFaceCulling) {
